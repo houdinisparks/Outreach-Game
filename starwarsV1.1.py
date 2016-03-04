@@ -14,14 +14,13 @@ import ParserThread
 pygame.init()
 
 level = 0
-numOfLevels = 8
+numOfLevels = 6
 white = (255,255,255)
 black = (0,0,0)
 red = (255,0,0)
 green = (0, 255, 0)
 yellow = (255, 255, 0)
 grey = (96, 125, 139)
-orange = (255, 87, 34)
 
 # default colour for text editor font
 txtfont_default = white
@@ -64,9 +63,9 @@ pygame.display.set_caption('Star Wars: A programming education game')
 
 wallpaper_img = 'wallpaper/Wallpaper.png'
 text_editor_img = 'pictures/right panel/Text editor.png'
-map_img = ['pictures/Map/Map_0.png','pictures/Map/Map_4.png','pictures/Map/Balcony_map.png',
-           'pictures/Map/Map_1.png','pictures/Map/Map_2.png','pictures/Map/Map_3.png',
-           'pictures/Map/Map_5.png','pictures/Map/docking_bay.png']
+map_img = ['pictures/Map/Map_0.png','pictures/Map/Map_1.png',
+           'pictures/Map/Map_2.png','pictures/Map/Map_3.png','pictures/Map/Map_4.png',
+           'pictures/Map/Map_5.png']
 
 lukeUpStationary = pygame.image.load('pictures/lukeMove/Luke_up_stationary.png')
 lukeUpWalk1 = pygame.image.load('pictures/lukeMove/Luke_up_walk_1.png')
@@ -92,39 +91,21 @@ reyLeftStationary = pygame.image.load('pictures/reyMove/Rey_left_walk_1.png')
 reyLeftWalk1 = pygame.image.load('pictures/reyMove/Rey_left_walk_1.png')
 reyLeftWalk2 = pygame.image.load('pictures/reyMove/Rey_left_walk_2.png')
 
-finnUpStationary = pygame.image.load('pictures/finnMove/Finn_up_stationary.png')
-finnUpWalk1 = pygame.image.load('pictures/finnMove/Finn_up_walk_1.png')
-finnUpWalk2 = pygame.image.load('pictures/finnMove/Finn_up_walk_2.png')
-finnDownStationary = pygame.image.load('pictures/finnMove/Finn_down_stationary.png')
-finnDownWalk1 = pygame.image.load('pictures/finnMove/Finn_down_walk_1.png')
-finnDownWalk2 = pygame.image.load('pictures/finnMove/Finn_down_walk_2.png')
-finnRightStationary = pygame.image.load('pictures/finnMove/Finn_right_stationary.png')
-finnRightWalk1 = pygame.image.load('pictures/finnMove/Finn_right_walk_1.png')
-finnRightWalk2 = pygame.image.load('pictures/finnMove/Finn_right_walk_2.png')
-finnLeftStationary = pygame.image.load('pictures/finnMove/Finn_left_stationary.png')
-finnLeftWalk1 = pygame.image.load('pictures/finnMove/Finn_left_walk_1.png')
-finnLeftWalk2 = pygame.image.load('pictures/finnMove/Finn_left_walk_2.png')
-
+lukeMoveUp = [lukeUpWalk1, lukeUpWalk2, lukeUpStationary]
+lukeMoveDown = [lukeDownWalk1, lukeDownWalk2, lukeDownStationary]
+lukeMoveRight = [lukeRightStationary, lukeRightWalk, lukeRightStationary]
+lukeMoveLeft = [lukeLeftStationary, lukeLeftWalk, lukeLeftStationary]
 
 reyMoveUp = [reyUpWalk1, reyUpWalk2, reyUpStationary]
 reyMoveDown = [reyDownWalk1, reyDownWalk2, reyDownStationary]
 reyMoveRight = [reyRightWalk1, reyRightWalk2, reyRightStationary]
 reyMoveLeft = [reyLeftWalk1, reyLeftWalk2, reyLeftStationary]
 
-lukeMoveUp = [lukeUpWalk1, lukeUpWalk2, lukeUpStationary]
-lukeMoveDown = [lukeDownWalk1, lukeDownWalk2, lukeDownStationary]
-lukeMoveRight = [lukeRightStationary, lukeRightWalk, lukeRightStationary]
-lukeMoveLeft = [lukeLeftStationary, lukeLeftWalk, lukeLeftStationary]
-
-finnMoveUp = [finnUpWalk1, finnUpWalk2, finnUpStationary]
-finnMoveDown = [finnDownWalk1, finnDownWalk2, finnDownStationary]
-finnMoveRight = [finnRightWalk1, finnRightWalk2, finnRightStationary]
-finnMoveLeft = [finnLeftWalk1, finnLeftWalk2, finnLeftStationary]
-
 blueprint_img = pygame.image.load('pictures/Blueprint.png')
 
 # holes
-holes = []
+holes = [Hole(gameDisplay, (750, 420)),
+         Hole(gameDisplay, (630, 420))]
 
 # for run button
 btnimg = pygame.image.load('pictures/runbtn.png').convert_alpha()
@@ -132,46 +113,56 @@ btn_rect = pygame.Rect(1075, 590, *btnimg.get_rect().size)
 
 clock = pygame.time.Clock()
 
-smallfont = pygame.font.Font('diehund.ttf', 30)
-medfont = pygame.font.Font('diehund.ttf', 40)
-largefont = pygame.font.Font('diehund.ttf', 90)
+smallfont = pygame.font.Font('diehund.ttf', 28)
+medfont = pygame.font.Font('diehund.ttf', 50)
+largefont = pygame.font.Font('diehund.ttf', 80)
 
-#sounds
+#sound fxps
+#---BGM
+bgm1 = "sounds/bgm1-throneroom.ogg"
+bgm1loop = "sounds/bgm1-throneroomloop.ogg"
+bgm2 = "sounds/bgm2-intothetraploop.ogg"
+bgm2loop = "sounds/bgm2-intothetrap.ogg"
+bgm3 = "sounds/bgm3-duelofthefates.ogg"
+bgm3loop = "sounds/bgm3-duelofthefatesloop.ogg"
+
 collectSaber = pygame.mixer.Sound("sounds/saberswing2.wav")
 pressC = pygame.mixer.Sound("sounds/start.wav")
 wallbang = pygame.mixer.Sound("sounds/wallbang.ogg")
+dvlist = ["sounds/darth vader - die1.wav","sounds/darth vader - i have you now.wav","sounds/darth vaer - breath.wav","sounds/darth vader - thisistheend.wav"]
+
+BEGIN_LOOP = pygame.USEREVENT + 1
 
 def loadLevel(level):
-    position=[[180,180],[0,450],[30,270],[750,540],[360,30],[420,30],[0,330],[30,270]]
-    levelXList = [[0,180,360,180,360,600,360,450],[0,120,270,420,690,540,390,240,0],
-                  [],[0,30,780,0,420,180,510,180,300,420,510,30,180,510,630],[0,0,60,390],
+    position=[[180,180],[750,540],[360,30],[420,30],[0,450],[0,330]]
+    levelXList = [[0,180,360,180,360,600,360,450],
+             [0,30,780,0,420,180,510,180,300,420,510,30,180,510,630],
+             [0,0,60,390],
              [0,0,270,330,360,450,450,450,450,450,750],
-             [0,0,300,540,180,420,660,0],[]]
-    levelYList = [[0,0,120,450,390,0,240,0],[0,0,0,0,0,150,270,390,510],[],
+             [0,120,270,420,690,540,390,240,0],
+             [0,0,300,540,180,420,660,0]]
+    levelYList = [[0,0,120,450,390,0,240,0],
                   [0,570,0,0,0,480,480,30,30,60,60,210,180,180,210],
                   [0,90,270,0],
                   [0,90,120,120,240,0,120,270,420,540,60],
-                  [0,180,180,180,270,270,240,390],[]]
+                  [0,0,0,0,0,150,270,390,510],
+                  [0,180,180,180,270,270,240,390]]
     widthlist = [[180,240,60,630,450,210,240,150],
-                 [120,150,150,150,120,150,150,150,240],[],
                  [30,780,30,390,780,120,120,120,90,90,120,150,120,120,180],
                  [360,60,300,420],
                  [420,240,60,90,60,360,270,180,270,360,60],
-                 [810,120,60,60,60,60,150,810],[]]
+                 [120,150,150,150,120,150,150,150,240],
+                 [810,120,60,60,60,60,150,810]]
     heightlist=[[600,120,60,150,60,390,90,180],
-                [420,300,180,60,600,450,330,210,90],[],
                 [600,30,570,60,60,90,90,120,90,60,90,120,210,210,120],
                 [90,510,330,600],
                 [90,390,360,90,360,90,90,90,90,60,480],
-                [180,120,120,120,120,120,150,210],[]]
-    win_width = [30,120,30,30,30,30,30,30]
-    win_height = [30,30,30,30,30,30,60,480]
-    win_xyCoordinates = [[420,0],[570,0],[780,270],[390,0],[360,570],
-                         [420,570],[780,180],[780,60]]
-    holeCoords = [[[570,180],[570,210]],[],[[390,0],[390,30],[390,60],[390,90],[390,120],[390,150],[390,180],[390,210],[390,240],[390,270],[390,300],[390,330],[390,360]
-                                            ,[390,390],[390,420],[390,450],[390,480],[390,510],[390,540],[390,570]]
-                  ,[],[],[],[],[]]
-    return [position[level][0],position[level][1],levelXList[level],levelYList[level],widthlist[level],heightlist[level],win_width[level],win_height[level], win_xyCoordinates[level][0],win_xyCoordinates[level][1],holeCoords[level]]
+                [420,300,180,60,600,450,330,210,90],
+                [180,120,120,120,120,120,150,210]]
+    win_width = [30,30,30,30,120,30]
+    win_height = [30,30,30,30,30,60]
+    win_xyCoordinates = [[420,0],[390,0],[360,570],[420,570],[570,0],[780,180]]
+    return [position[level][0],position[level][1],levelXList[level],levelYList[level],widthlist[level],heightlist[level],win_width[level],win_height[level], win_xyCoordinates[level][0],win_xyCoordinates[level][1]]
 
 def done_moving():
     if movement.get_next_move() == 'stationary':
@@ -247,8 +238,8 @@ def pause():
         clock.tick(5)
 
 def status(score,set_time,elapse_time):
-    text = smallfont.render("Score:          " + str(score), True, black)
-    gameDisplay.blit(text,[55,map_height])
+    text = smallfont.render("Score: " + str(score), True, black)
+    gameDisplay.blit(text,[15,map_height])
 
     if(elapse_time>set_time):
         elapse_time=set_time
@@ -261,6 +252,24 @@ def randBlueprintGen():
     randBlueprintX = 120
     randBlueprintY = 150
     return randBlueprintX, randBlueprintY
+
+#----Sounds method for choosing which bgm to load-----------#
+def loadBGM(level):
+    loadList = []
+    
+    if level == 1 or level == 2 or level == 3 or level == 0:
+        loadList = [bgm1,bgm1loop]
+        
+    elif level == 4 or level == 5 or level == 6:
+        loadList = [bgm2,bgm2loop]
+        
+    elif level == 7 or level == 8 or level == 9:
+        loadList = [bgm3, bgm3loop]
+        
+    else:
+        print "no sound loaded."
+
+    return loadList
 
 def game_intro():
     global characterMove
@@ -275,11 +284,8 @@ def game_intro():
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_p:
-                    characterMove = [lukeMoveUp, lukeMoveDown, lukeMoveRight, lukeMoveLeft]
-                    intro=False
                 if event.key == pygame.K_m:
-                    characterMove = [finnMoveUp, finnMoveDown, finnMoveRight, finnMoveLeft]
+                    characterMove = [lukeMoveUp, lukeMoveDown, lukeMoveRight, lukeMoveLeft]
                     intro=False
                 if event.key == pygame.K_f:
                     characterMove = [reyMoveUp, reyMoveDown, reyMoveRight, reyMoveLeft]
@@ -325,8 +331,8 @@ def rebel_move(direction, playerX, playerY, xChange, yChange, rebelScore, time_l
                 #barrier(xlocation, randomHeight, barrier_width)
                 gameDisplay.blit(blueprint_img, (randBlueprintX, randBlueprintY))
 
-##            holes[0].draw()
-##            holes[1].draw()
+            holes[0].draw()
+            holes[1].draw()
             gameDisplay.blit(btnimg, btn_rect)
             gameDisplay.blit(img, (playerX, playerY))
 
@@ -379,10 +385,9 @@ def rebel_jump(direction, playerX, playerY, xChange, yChange, rebelScore, time_l
             if blueprintCollected == False:
                 #barrier(xlocation, randomHeight, barrier_width)
                 gameDisplay.blit(blueprint_img, (randBlueprintX, randBlueprintY))
-                
-            #for checking hole position
-##            for hole in holes:
-##                hole.draw()
+
+            holes[0].draw()
+            holes[1].draw()
             gameDisplay.blit(btnimg, btn_rect)
             gameDisplay.blit(img, (playerX, playerY))
 
@@ -414,7 +419,7 @@ def message_to_screen(msg,color, y_displace = 0, size = "small"):
 
 def gameLoop():
     global parsing, game_state, text_editor, elemNumber, level,txtbx, game_map, blueprintCollected, characterMove,numOfLevels
-    global lead_x, lead_y, lead_direction,holes
+    global lead_x, lead_y, lead_direction
     gameWon = False
     gameExit = False
     gameOver = False
@@ -423,7 +428,15 @@ def gameLoop():
     topCollision = False
     bottomCollision = False
     player = characterMove[1][2]
-    [lead_x,lead_y,xlist,ylist,widthlist,heightlist,win_width,win_height,win_xlocation,win_ylocation,holeCoords] = loadLevel(level)
+    [lead_x,lead_y,xlist,ylist,widthlist,heightlist,win_width,win_height,win_xlocation,win_ylocation] = loadLevel(level)
+
+    #----load level music----#
+    
+
+    # WinGrid - size and location for win state to be triggered
+##    win_width = 30
+##    win_xlocation = 390
+##    win_ylocation = 0
     
     lead_x_change = 0
     lead_y_change = 0
@@ -435,9 +448,7 @@ def gameLoop():
 
     timerStart=False
     seconds=0
-    del holes[:]
-    for i in range(len(holeCoords)):
-        holes.append(Hole(gameDisplay, (holeCoords[i][0], holeCoords[i][1])))
+
     # use get_ticks to time
     #timer.reset()
 
@@ -453,19 +464,33 @@ def gameLoop():
     xlocation = (map_width/2)+ random.randint(-0.2*map_width, 0.2*map_width)
     ylocation = random.randrange(map_height*0.1,map_height*0.6)
 
-    dvlist = ["sounds/darth vader - die1.wav","sounds/darth vader - i have you now.wav","sounds/darth vaer - breath.wav","sounds/darth vader - thisistheend.wav"]
-    playonce = 0
-    if playonce == 0:
-        pygame.mixer.music.load("sounds/level 1 - throne room.ogg")
-        pygame.mixer.music.play(0)
-        playonce = 1
-
+    #----------LOAD BGM-----------#
+    beginloop = False
+    bgmlist = loadBGM(level)
+    print len(bgmlist)
+    print bgmlist[0]
+    print bgmlist[1]
+    pygame.mixer.music.stop() # make sure theres no music playing.
+    pygame.mixer.music.load(bgmlist[0])
+    pygame.mixer.music.play(0)
+    pygame.mixer.music.set_endevent(BEGIN_LOOP)
+    
     while not gameExit:
+        #Check if bgm has finish playing
+               
+        event = pygame.mixer.music.get_endevent()
+                
+        if event == BEGIN_LOOP and beginloop == False:
+                beginloop = True
+                print "loop begins"
+                pygame.mixer.music.load(bgmlist[1]) #load music loop
+                pygame.mixer.music.play(-1)         #play indefinitely
+
         if gameWon == True:
             #-----sounds
             pygame.mixer.music.stop()
-            pygame.mixer.music.load("sounds/lose - imperial march.ogg")
-            pygame.mixer.music.play(0)
+            pygame.mixer.music.load("sounds/victorybgm.ogg")
+            pygame.mixer.music.play(-1)
             #-----sounds
             level = (level+1)%numOfLevels
             message_to_screen("You won!", red,
@@ -482,15 +507,15 @@ def gameLoop():
             #-----sounds
             pygame.mixer.music.stop()
             pygame.mixer.music.load("sounds/lose - imperial march.ogg")
-            pygame.mixer.music.play(0)
+            pygame.mixer.music.play(-1)
             pygame.mixer.Sound(dvlist[randnumb]).play()
             #-----sounds
-            message_to_screen("GAME OVER", red,
+            message_to_screen("Game over", red,
                               y_displace=-50, size = "large")
-            message_to_screen("Press C to play again", orange,
-                              50, size = "medium")
-            message_to_screen("or Q to quit", orange,
-                              100, size = "medium")
+            message_to_screen("Press C to play again", grey,
+                              50, size = "small")
+            message_to_screen("or Q to quit", grey,
+                              100, size = "small")
             pygame.display.update()
 
         while gameOver == True or gameWon == True:
@@ -589,9 +614,9 @@ def gameLoop():
                     blueprintCollected = True
 
         clock.tick(30)
-            ##for checking holes in map
-##        for hole in holes:
-##            hole.draw()
+
+        holes[0].draw()
+        holes[1].draw()
 
     ######################### Player controls - Keypress or Typed text #########################
 
