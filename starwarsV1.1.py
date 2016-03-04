@@ -168,8 +168,8 @@ largefont = pygame.font.Font('diehund.ttf', 80)
 #---BGM
 bgm1 = "sounds/bgm1-throneroom.ogg"
 bgm1loop = "sounds/bgm1-throneroomloop.ogg"
-bgm2 = "sounds/bgm2-intothetraploop.ogg"
-bgm2loop = "sounds/bgm2-intothetrap.ogg"
+bgm2 = "sounds/bgm2-intothetrap.ogg"
+bgm2loop = "sounds/bgm2-intothetraploop.ogg"
 bgm3 = "sounds/bgm3-countdooku.ogg"
 bgm3loop = "sounds/bgm3-countdookuloop.ogg"
 bgm4 = "sounds/bgm4-duelofthefates.ogg"
@@ -444,10 +444,10 @@ def loadBGM(level):
     elif level == 3 or level == 4:
         loadList = [bgm2,bgm2loop]
 
-    elif level == 5 or level == 6:
+    elif level == 5 or level == 6 or level == 7:
         loadList == [bgm3, bgm3loop]
         
-    elif level == 7 or level == 8 or level == 9:
+    elif level == 8 or level == 9:
         loadList = [bgm4, bgm4loop]
         
     else:
@@ -712,19 +712,20 @@ def gameLoop():
     print bgmlist[1]
     pygame.mixer.music.stop() # make sure theres no music playing.
     pygame.mixer.music.load(bgmlist[0])
-    #pygame.mixer.music.play(0)
+    pygame.mixer.music.play(0)
     pygame.mixer.music.set_endevent(BEGIN_LOOP)
     
     while not gameExit:
         #Check if bgm has finish playing
                
         event = pygame.mixer.music.get_endevent()
+        pygame.mixer.music.queue(bgmlist[1])
                 
-        if event == BEGIN_LOOP and beginloop == False:
-                beginloop = True
-                print "loop begins"
-                pygame.mixer.music.load(bgmlist[1]) #load music loop
-                #pygame.mixer.music.play(-1)         #play indefinitely
+##        if event == BEGIN_LOOP and beginloop == False:
+##                beginloop = True
+##                print "loop begins"
+##                pygame.mixer.music.load(bgmlist[1]) #load music loop
+##                #pygame.mixer.music.play(-1)         #play indefinitely
 
         if gameWon == True:
             #-----sounds
