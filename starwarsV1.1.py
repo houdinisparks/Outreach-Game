@@ -18,7 +18,7 @@ import ParserThread
 
 pygame.init()
 
-level = 7
+level = 0
 numOfLevels = 9
 rebelScore = 0
 
@@ -170,11 +170,13 @@ bgm1 = "sounds/bgm1-throneroom.ogg"
 bgm1loop = "sounds/bgm1-throneroomloop.ogg"
 bgm2 = "sounds/bgm2-intothetraploop.ogg"
 bgm2loop = "sounds/bgm2-intothetrap.ogg"
-bgm3 = "sounds/bgm3-duelofthefates.ogg"
-bgm3loop = "sounds/bgm3-duelofthefatesloop.ogg"
+bgm3 = "sounds/bgm3-countdooku.ogg"
+bgm3loop = "sounds/bgm3-countdookuloop.ogg"
+bgm4 = "sounds/bgm4-duelofthefates.ogg"
+bgm4loop = "sounds/bgm4-duelofthefatesloop.ogg"
 
 fall = pygame.mixer.Sound("sounds/fall1.ogg")
-bangwall = pygame.mixer.Sound("sounds/bangwall.ogg")
+bangwall = pygame.mixer.Sound("sounds/wallbang.ogg")    #done
 collectblueprint= pygame.mixer.Sound("sounds/collectblueprint1.ogg")
 jump1 = pygame.mixer.Sound("sounds/jump1.ogg")
 startGame = pygame.mixer.Sound("sounds/start.ogg")
@@ -438,14 +440,17 @@ def randBlueprintGen():
 def loadBGM(level):
     loadList = []
     
-    if level == 1 or level == 2 or level == 3 or level == 0:
+    if level == 1 or level == 2 or level == 0:
         loadList = [bgm1,bgm1loop]
         
-    elif level == 4 or level == 5 or level == 6:
+    elif level == 3 or level == 4:
         loadList = [bgm2,bgm2loop]
+
+    elif level == 5 or level == 6:
+        loadList == [bgm3, bgm3loop]
         
     elif level == 7 or level == 8 or level == 9:
-        loadList = [bgm3, bgm3loop]
+        loadList = [bgm4, bgm4loop]
         
     else:
         print "no sound loaded."
@@ -644,6 +649,7 @@ def crashed_into_wall(lead_x, lead_y, xlist, ylist, widthlist, heightlist):
     for i in range(len(xlist)):
         wall = pygame.Rect(xlist[i], ylist[i], widthlist[i], heightlist[i])
         if wall.colliderect(player_rect): return True
+        
     return False
 
 def linecount_to_score(n):
