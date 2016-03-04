@@ -18,7 +18,7 @@ import ParserThread
 
 pygame.init()
 
-level = 0
+level = 7
 numOfLevels = 9
 rebelScore = 0
 
@@ -28,7 +28,7 @@ red = (255,0,0)
 green = (0, 255, 0)
 yellow = (255, 255, 0)
 grey = (96, 125, 139)
-orange = (255, 87, 34)
+orange = (255,87,34)
 
 # default colour for text editor font
 txtfont_default = white
@@ -73,11 +73,12 @@ rebelScore = 0
 BlueprintThickness = 30
 block_size = 10
 FPS = 30
-gameDisplay = pygame.display.set_mode((display_width,display_height),FULLSCREEN)
+gameDisplay = pygame.display.set_mode((display_width,display_height),RESIZABLE)
 pygame.display.set_caption('Star Wars: A programming education game')
 
 wallpaper_img = 'wallpaper/Wallpaper.png'
 text_editor_img = 'pictures/right panel/Text editor.png'
+
 map_img = ['pictures/Map/warm_up.png',
            'pictures/Map/Map_0.png','pictures/Map/Map_4.png','pictures/Map/Balcony_map.png',
            'pictures/Map/Map_1.png','pictures/Map/Map_2.png','pictures/Map/Map_3.png',
@@ -150,7 +151,8 @@ mFalconFireUp = [mFalconStationary, mFalconThrusterSmall, mFalconStationary, mFa
 blueprint_img = pygame.image.load('pictures/Blueprint.png')
 
 # holes
-holes = []
+holes = [Hole(gameDisplay, (750, 420)),
+         Hole(gameDisplay, (630, 420))]
 
 # for run button
 btnimg = pygame.image.load('pictures/runbtn.png').convert_alpha()
@@ -158,14 +160,29 @@ btn_rect = pygame.Rect(1075, 590, *btnimg.get_rect().size)
 
 clock = pygame.time.Clock()
 
-smallfont = pygame.font.Font('diehund.ttf', 30)
-medfont = pygame.font.Font('diehund.ttf', 40)
-largefont = pygame.font.Font('diehund.ttf', 90)
+smallfont = pygame.font.Font('diehund.ttf', 28)
+medfont = pygame.font.Font('diehund.ttf', 50)
+largefont = pygame.font.Font('diehund.ttf', 80)
 
-#sounds
-collectSaber = pygame.mixer.Sound("sounds/saberswing2.wav")
-pressC = pygame.mixer.Sound("sounds/start.wav")
-wallbang = pygame.mixer.Sound("sounds/wallbang.ogg")
+#sound fxps
+#---BGM
+bgm1 = "sounds/bgm1-throneroom.ogg"
+bgm1loop = "sounds/bgm1-throneroomloop.ogg"
+bgm2 = "sounds/bgm2-intothetraploop.ogg"
+bgm2loop = "sounds/bgm2-intothetrap.ogg"
+bgm3 = "sounds/bgm3-duelofthefates.ogg"
+bgm3loop = "sounds/bgm3-duelofthefatesloop.ogg"
+
+fall = pygame.mixer.Sound("sounds/fall1.ogg")
+bangwall = pygame.mixer.Sound("sounds/bangwall.ogg")
+collectblueprint= pygame.mixer.Sound("sounds/collectblueprint1.ogg")
+jump1 = pygame.mixer.Sound("sounds/jump1.ogg")
+startGame = pygame.mixer.Sound("sounds/start.ogg")
+wallbang = pygame.mixer.Sound("sounds/bang1.ogg")
+dvlist = ["sounds/darth vader - die1.wav","sounds/darth vader - i have you now.wav","sounds/darth vaer - breath.wav","sounds/darth vader - thisistheend.wav"]
+
+
+BEGIN_LOOP = pygame.USEREVENT + 1
 
 def loadLevel(level):
     position=[[360,570],[180,180],[0,450],[30,270],[750,540],[360,30],[420,30],[60,330],[30,270]]
@@ -402,8 +419,8 @@ def helpInstructions(level):
 
 
 def status(score,set_time,elapse_time):
-    text = smallfont.render("Score:          " + str(score), True, black)
-    gameDisplay.blit(text,[55,map_height])
+    text = smallfont.render("Score: " + str(score), True, black)
+    gameDisplay.blit(text,[15,map_height])
 
     if(elapse_time>set_time):
         elapse_time=set_time
@@ -416,6 +433,24 @@ def randBlueprintGen():
     randBlueprintX = 120
     randBlueprintY = 150
     return randBlueprintX, randBlueprintY
+
+#----Sounds method for choosing which bgm to load-----------#
+def loadBGM(level):
+    loadList = []
+    
+    if level == 1 or level == 2 or level == 3 or level == 0:
+        loadList = [bgm1,bgm1loop]
+        
+    elif level == 4 or level == 5 or level == 6:
+        loadList = [bgm2,bgm2loop]
+        
+    elif level == 7 or level == 8 or level == 9:
+        loadList = [bgm3, bgm3loop]
+        
+    else:
+        print "no sound loaded."
+
+    return loadList
 
 def game_intro():
     global characterMove
@@ -430,13 +465,12 @@ def game_intro():
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_p:
+                if event.key == pygame.K_m:
+                    startGame.play()
                     characterMove = [lukeMoveUp, lukeMoveDown, lukeMoveRight, lukeMoveLeft]
                     intro=False
-                if event.key == pygame.K_m:
-                    characterMove = [finnMoveUp, finnMoveDown, finnMoveRight, finnMoveLeft]
-                    intro=False
                 if event.key == pygame.K_f:
+                    startGame.play()
                     characterMove = [reyMoveUp, reyMoveDown, reyMoveRight, reyMoveLeft]
                     intro=False
                 if event.key == pygame.K_q:
@@ -473,11 +507,13 @@ def rebel_move(direction, playerX, playerY, xChange, yChange, rebelScore, time_l
             #barrier(xlocation, randomHeight, barrier_width)
             gameDisplay.blit(blueprint_img, (randBlueprintX, randBlueprintY))
 
+
 ##            holes[0].draw()
 ##            holes[1].draw()
         gameDisplay.blit(btnimg, btn_rect)
         gameDisplay.blit(img, (playerX, playerY))
         draw_holes()
+
 
         image = img
 
@@ -574,6 +610,7 @@ def mfalcon_fly(mFalconX, mFalconY, rebelScore, time_limit, seconds, randBluepri
 
             if not blueprintCollected:
                 gameDisplay.blit(blueprint_img, (randBlueprintX, randBlueprintY))
+                
             gameDisplay.blit(btnimg, btn_rect)
             draw_holes()
 
@@ -629,8 +666,10 @@ def message_to_screen(msg,color, y_displace = 0, size = "small"):
 
 
 def gameLoop():
+
     global parsing, game_state, text_editor, elemNumber, level,txtbx, game_map, blueprintCollected, characterMove,numOfLevels, rebelScore
     global lead_x, lead_y, lead_direction,holes
+
     gameWon = False
     gameExit = False
     gameOver = False
@@ -639,6 +678,7 @@ def gameLoop():
     topCollision = False
     bottomCollision = False
     player = characterMove[1][2]
+
     [lead_x,lead_y,xlist,ylist,widthlist,heightlist,win_width,win_height,win_xlocation,win_ylocation,holeCoords,vadarOrientation] = loadLevel(level)
     
     lead_x_change = 0
@@ -651,9 +691,7 @@ def gameLoop():
 
     timerStart=False
     seconds=0
-    del holes[:]
-    for i in range(len(holeCoords)):
-        holes.append(Hole(gameDisplay, (holeCoords[i][0], holeCoords[i][1])))
+
     # use get_ticks to time
     #timer.reset()
 
@@ -662,19 +700,33 @@ def gameLoop():
     xlocation = (map_width/2)+ random.randint(-0.2*map_width, 0.2*map_width)
     ylocation = random.randrange(map_height*0.1,map_height*0.6)
 
-    dvlist = ["sounds/darth vader - die1.wav","sounds/darth vader - i have you now.wav","sounds/darth vaer - breath.wav","sounds/darth vader - thisistheend.wav"]
-    playonce = 0
-    if playonce == 0:
-        pygame.mixer.music.load("sounds/level 1 - throne room.ogg")
-        pygame.mixer.music.play(0)
-        playonce = 1
-
+    #----------LOAD BGM-----------#
+    beginloop = False
+    bgmlist = loadBGM(level)
+    print len(bgmlist)
+    print bgmlist[0]
+    print bgmlist[1]
+    pygame.mixer.music.stop() # make sure theres no music playing.
+    pygame.mixer.music.load(bgmlist[0])
+    pygame.mixer.music.play(0)
+    pygame.mixer.music.set_endevent(BEGIN_LOOP)
+    
     while not gameExit:
+        #Check if bgm has finish playing
+               
+        event = pygame.mixer.music.get_endevent()
+                
+        if event == BEGIN_LOOP and beginloop == False:
+                beginloop = True
+                print "loop begins"
+                pygame.mixer.music.load(bgmlist[1]) #load music loop
+                pygame.mixer.music.play(-1)         #play indefinitely
+
         if gameWon == True:
             #-----sounds
             pygame.mixer.music.stop()
-            pygame.mixer.music.load("sounds/lose - imperial march.ogg")
-            pygame.mixer.music.play(0)
+            pygame.mixer.music.load("sounds/victorybgm.ogg")
+            pygame.mixer.music.play(-1)
             #-----sounds
             level = (level+1)%numOfLevels
             message_to_screen("Level cleared!", red,
@@ -689,15 +741,12 @@ def gameLoop():
             pygame.display.update()
 
         elif gameOver == True:
-            randnumb = random.randint(0,len(dvlist)-1)
-            #-----sounds
             pygame.mixer.music.stop()
             pygame.mixer.music.load("sounds/lose - imperial march.ogg")
-            pygame.mixer.music.play(0)
-            pygame.mixer.Sound(dvlist[randnumb]).play()
-            #-----sounds
-            message_to_screen("GAME OVER", red,
+            pygame.mixer.music.play(-1)
+            message_to_screen("Game over", red,
                               y_displace=-50, size = "large")
+
             message_to_screen("Press C to play again", orange,
                               50, size = "medium")
             message_to_screen("or Q to quit", orange,
@@ -707,6 +756,7 @@ def gameLoop():
                 gameDisplay.blit(darthDownStationary, (win_xlocation, win_ylocation))
             else:
                 gameDisplay.blit(darthLeftStationary, (win_xlocation, win_ylocation))
+
             pygame.display.update()
 
         while gameOver == True or gameWon == True:
@@ -726,7 +776,6 @@ def gameLoop():
                         game_state = 'idle'
                         gameWon= False
                         pygame.mixer.music.stop()
-                        pressC.play()
                         gameLoop()
                         
 
@@ -735,6 +784,10 @@ def gameLoop():
             timer.update()
             seconds = timer.get_time() #calculate how many seconds
             if (time_limit - seconds)<=0:
+                randnumb = random.randint(0,len(dvlist)-1)
+                #-----sounds
+                pygame.mixer.Sound(dvlist[randnumb]).play()
+                #-----sounds
                 gameOver=True
             #print (seconds) #print how many seconds
 
@@ -808,9 +861,9 @@ def gameLoop():
                     blueprintCollected = True
 
         clock.tick(30)
-            ##for checking holes in map
-##        for hole in holes:
-##            hole.draw()
+
+        holes[0].draw()
+        holes[1].draw()
 
     ######################### Player controls - Keypress or Typed text #########################
 
@@ -872,6 +925,7 @@ def gameLoop():
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
 
             elif next_move == 'jump_up':
+                jump1.play()
                 if topCollision:
                     lead_x, lead_y, player = rebel_jump(0, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
@@ -881,6 +935,7 @@ def gameLoop():
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
 
             elif next_move == 'jump_down':
+                jump1.play()
                 if bottomCollision:
                     lead_x, lead_y, player = rebel_jump(1, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
@@ -890,7 +945,7 @@ def gameLoop():
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
 
             elif next_move == 'jump_left':
-
+                jump1.play()
                 if leftCollision:
                     lead_x, lead_y, player = rebel_jump(3, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
@@ -900,7 +955,7 @@ def gameLoop():
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
 
             elif next_move == 'jump_right':
-
+                jump1.play()
                 if rightCollision:
                     lead_x, lead_y, player = rebel_jump(2, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
@@ -916,13 +971,16 @@ def gameLoop():
             rightCollision = False
 
         if crashed_into_wall(lead_x, lead_y, xlist, ylist, widthlist, heightlist):
+            bangwall.play()
             gameOver = True
                     
         # check if player is on a hole
         for hole in holes:
+            
             player_rect = pygame.Rect(lead_x, lead_y, 30, 30)
             collide_direction = hole.collides(player_rect)
             if collide_direction == 'exact':
+                fall.play()
                 gameOver = True
 
         if parsing:
