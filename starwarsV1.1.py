@@ -176,7 +176,7 @@ bgm4 = "sounds/bgm4-duelofthefates.ogg"
 bgm4loop = "sounds/bgm4-duelofthefatesloop.ogg"
 
 fall = pygame.mixer.Sound("sounds/fall1.ogg")
-bangwall = pygame.mixer.Sound("sounds/wallbang.ogg")    #done
+bangwall = pygame.mixer.Sound("sounds/bangwall1.ogg")    #done
 collectblueprint= pygame.mixer.Sound("sounds/collectblueprint1.ogg")
 jump1 = pygame.mixer.Sound("sounds/jump1.ogg")
 startGame = pygame.mixer.Sound("sounds/start.ogg")
@@ -291,10 +291,8 @@ def display_error():
                     pygame.quit()
                     quit()
 
-        clock.tick(5)
+    clock.tick(5)
     game_state = 'idle'
-    pygame.mixer.music.stop()
-    pressC.play()
     gameLoop()
 
 
@@ -714,7 +712,7 @@ def gameLoop():
     print bgmlist[1]
     pygame.mixer.music.stop() # make sure theres no music playing.
     pygame.mixer.music.load(bgmlist[0])
-    pygame.mixer.music.play(0)
+    #pygame.mixer.music.play(0)
     pygame.mixer.music.set_endevent(BEGIN_LOOP)
     
     while not gameExit:
@@ -726,7 +724,7 @@ def gameLoop():
                 beginloop = True
                 print "loop begins"
                 pygame.mixer.music.load(bgmlist[1]) #load music loop
-                pygame.mixer.music.play(-1)         #play indefinitely
+                #pygame.mixer.music.play(-1)         #play indefinitely
 
         if gameWon == True:
             #-----sounds
@@ -895,6 +893,7 @@ def gameLoop():
                 lead_y_change = 0
             elif next_move == 'move_up':
                 if topCollision:
+                    bangwall.play()
                     lead_x, lead_y, player = rebel_move(0, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
                     # topCollision = False
@@ -904,6 +903,7 @@ def gameLoop():
 
             elif next_move == 'move_down':
                 if bottomCollision:
+                    bangwall.play()
                     lead_x, lead_y, player = rebel_move(1, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
                     # bottomCollision = False
@@ -913,6 +913,7 @@ def gameLoop():
 
             elif next_move == 'move_left':
                 if leftCollision:
+                    bangwall.play()
                     lead_x, lead_y, player = rebel_move(3, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
                     # leftCollision = False
@@ -923,6 +924,7 @@ def gameLoop():
             elif next_move == 'move_right':
 
                 if rightCollision:
+                    bangwall.play()
                     lead_x, lead_y, player = rebel_move(2, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
                     # rightCollision = False
@@ -933,6 +935,7 @@ def gameLoop():
             elif next_move == 'jump_up':
                 jump1.play()
                 if topCollision:
+                    bangwall.play()
                     lead_x, lead_y, player = rebel_jump(0, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
                     # topCollision = False
@@ -943,6 +946,7 @@ def gameLoop():
             elif next_move == 'jump_down':
                 jump1.play()
                 if bottomCollision:
+                    bangwall.play()
                     lead_x, lead_y, player = rebel_jump(1, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
                     # bottomCollision = False
@@ -953,6 +957,7 @@ def gameLoop():
             elif next_move == 'jump_left':
                 jump1.play()
                 if leftCollision:
+                    bangwall.play()
                     lead_x, lead_y, player = rebel_jump(3, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
                     # leftCollision = False
@@ -963,6 +968,7 @@ def gameLoop():
             elif next_move == 'jump_right':
                 jump1.play()
                 if rightCollision:
+                    bangwall.play()
                     lead_x, lead_y, player = rebel_jump(2, lead_x, lead_y, 0, 0, rebelScore, time_limit, seconds, xlocation, ylocation,
                                                     barrier_width, barrier_height, randBlueprintX, randBlueprintY)
                     # rightCollision = False
