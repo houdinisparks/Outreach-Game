@@ -182,7 +182,7 @@ def holeInFront():
     for hole in holes:
         player_rect = pygame.Rect(lead_x, lead_y, 30, 30)
         collide_direction = hole.collides(player_rect)
-        print player_rect
+        print (player_rect)
         print 'psuedo_holes', collide_direction
         print 'lead_direction', lead_direction
         # if lead_direction == collide_direction: return True
