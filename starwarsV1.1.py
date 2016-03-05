@@ -18,7 +18,7 @@ import ParserThread
 
 pygame.init()
 
-level = 0
+level = 6
 numOfLevels = 9
 rebelScore = 0
 
@@ -445,7 +445,7 @@ def loadBGM(level):
         loadList = [bgm2,bgm2loop]
 
     elif level == 5 or level == 6 or level == 7:
-        loadList == [bgm3, bgm3loop]
+        loadList = [bgm3, bgm3loop]
         
     elif level == 8 or level == 9:
         loadList = [bgm4, bgm4loop]
